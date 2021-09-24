@@ -129,7 +129,6 @@ func (s *TrxTestSuite) TestTransaction_FindProductOnRedis() {
 	b, _ := responseDummy.MarshalJSON()
 
 	s.redis.On("Get", ctx, mock.Anything).Return(b, nil)
-	//s.product.On("Detail", ctx, productID).Return(responseDummy, nil)
 	product, err := s.act.FindProduct(ctx, productID)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), responseDummy, product)
