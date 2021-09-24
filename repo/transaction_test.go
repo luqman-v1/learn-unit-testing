@@ -58,15 +58,16 @@ func (s *TrxTestSuite) AfterTest(_, _ string) {
 	s.redis.AssertExpectations(s.T())
 }
 
-func (s *TrxTestSuite) TestTransaction_CalculateTotalTax() {
-	assert.Equal(s.T(), float64(100), s.act.CalculateTotalTax(1000, 10))
-}
 func (s *TrxTestSuite) TestTransaction_CalculateTotalBill() {
 	assert.Equal(s.T(), float64(10000), s.act.CalculateTotalBill(1000, 10))
 }
 
+func (s *TrxTestSuite) TestTransaction_CalculateTotalTax() {
+	assert.Equal(s.T(), float64(900), s.act.CalculateTotalTax(1000, 10))
+}
+
 func (s *TrxTestSuite) TestTransaction_CalculateTotalDiscount() {
-	assert.Equal(s.T(), float64(9000), s.act.CalculateTotalDiscount(10000, 1000))
+	assert.Equal(s.T(), float64(1000), s.act.CalculateTotalDiscount(10000, 1000))
 }
 
 func (s *TrxTestSuite) TestTransaction_Order() {
@@ -94,13 +95,13 @@ func (s *TrxTestSuite) TestTransaction_Order() {
 
 	salesDummy := entity.SalesModel{
 		TotalBill:     10000,
-		TotalDiscount: 9000,
-		TotalTax:      1000,
+		TotalDiscount: 1000,
+		TotalTax:      900,
 		Quantity:      10,
 		ProductID:     "1",
 		Price:         1000,
 	}
-	s.sales.On("Insert", ctx, mock.Anything, salesDummy).Return(salesDummy, nil)
+	s.sales.On("Insert", ctx, mock.Anything, mock.Anything).Return(salesDummy, nil)
 
 	s.discount.On("Insert", ctx, mock.Anything, mock.Anything).Return(entity.Discount{
 		SalesID: "1",
@@ -115,8 +116,8 @@ func (s *TrxTestSuite) TestTransaction_Order() {
 	resp, err := s.act.Order(ctx, request)
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), float64(10000), resp.TotalBill)
-	assert.Equal(s.T(), float64(9000), resp.TotalDiscount)
-	assert.Equal(s.T(), float64(1000), resp.TotalTax)
+	assert.Equal(s.T(), float64(1000), resp.TotalDiscount)
+	assert.Equal(s.T(), float64(900), resp.TotalTax)
 }
 
 func (s *TrxTestSuite) TestTransaction_FindProductOnRedis() {

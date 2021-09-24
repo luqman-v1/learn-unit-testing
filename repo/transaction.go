@@ -31,11 +31,11 @@ func (t *Transaction) CalculateTotalBill(price, quantity float64) float64 {
 }
 
 func (t *Transaction) CalculateTotalTax(totalBill, tax float64) float64 {
-	return (tax / 100) * totalBill
+	return totalBill - (tax/100)*totalBill
 }
 
 func (t *Transaction) CalculateTotalDiscount(totalBill, discount float64) float64 {
-	return totalBill - discount
+	return totalBill - (totalBill - discount)
 }
 
 func (t *Transaction) keyRedis(productID string) string {
